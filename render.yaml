@@ -3,8 +3,14 @@ services:
     name: vulnbank-demo
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    buildCommand: pip install -r requirements.txt && python -c "from app import init_db; import os; os.makedirs('userfiles',exist_ok=True); init_db()"
+    startCommand: gunicorn app:app --preload
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: DB_PATH
+        value: /opt/render/project/src/vulnbank.db
+    disk:
+      name: data
+      mountPath: /opt/render/project/src
+      sizeGB: 1
